@@ -234,6 +234,8 @@ async function _makeAttackRoll(actor, itemId){
     rollData.dice = "1d20";
     rollData.weaponName = weapon.name;
 
+    console.log(rollData);
+
     //Determining the final modifier string.
     let abString = ((actor.system.ab >= 0) ? "+" : "") + String(actor.system.ab);           //The ab with a + sign if needed.
     let weaponAbString = ((weapon.system.ab >= 0) ? "+" : "") + String(weapon.system.ab);   //The weapon ab with a + sign if needed.
@@ -242,13 +244,18 @@ async function _makeAttackRoll(actor, itemId){
     let attributeModString = "";
 
     if(actor.type === "character"){
-        const skill = actor.getEmbeddedDocument("Item", weapon.system.skill);
+        let skill = actor.getEmbeddedDocument("Item", weapon.system.skill);
+
+        if(rollData.skill !== ""){
+            skill = actor.getEmbeddedDocument("Item", rollData.skill);
+        }
+        
         
         //Untrained skills take a -2 to hit. And adding a + sign if needed.
         skillLevelString = "-2";
         if(skill){
             if (skill.system.rank !== -1) skillLevelString = skill.system.rank;
-            if (skillLevelString >= 0) "+" + skillLevelString;
+            skillLevelString = ((skillLevelString >= 0) ? "+" : "") + String(skillLevelString);
         }
 
         //The attribute mod is the higher of the two stats.
